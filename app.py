@@ -369,6 +369,54 @@ def run_pipeline(category, item, job_id, item_key, bg_desc_override=None, commen
         download_image(bg_url, out_dir / f"{item}-background.png")
         item_status["completed_steps"].append("background"); _save_regen_jobs()
 
+        # Step 6: Generate sketch from object
+        item_status["step"] = "generating sketch"
+        r = fal_client.run("fal-ai/nano-banana-2/edit", arguments={
+            "image_urls": [obj_raw_url],
+            "prompt": (
+                "Convert this illustration into a simple coloring book line drawing. "
+                "Bold thick black outlines only on pure white background. No colors, no shading, no fills. "
+                "Lines should be thick and heavy, suitable for a young child to color in. "
+                "Keep the exact same shape and proportions of the object."
+            ),
+            "output_format": "png",
+        })
+        sketch_url = r["images"][0]["url"]
+        download_image(sketch_url, out_dir / f"{item}-sketch.png")
+        item_status["completed_steps"].append("sketch"); _save_regen_jobs()
+
+        # Step 7: Create outline (alpha = 255 - pixel_value)
+        item_status["step"] = "creating outline"
+        sketch_img = Image.open(out_dir / f"{item}-sketch.png").convert("L")
+        gray = np.array(sketch_img)
+        h, w = gray.shape
+        outline_rgba = np.zeros((h, w, 4), dtype=np.uint8)
+        outline_rgba[:, :, 3] = 255 - gray
+        outline_img = Image.fromarray(outline_rgba)
+        outline_img.save(out_dir / f"{item}-outline.png")
+        item_status["completed_steps"].append("outline"); _save_regen_jobs()
+
+        # Step 8: Create sketch-object (white fill inside object + outline on top)
+        item_status["step"] = "creating sketch object"
+        obj_for_mask = Image.open(out_dir / f"{item}-object.png").convert("RGBA")
+        obj_alpha = np.array(obj_for_mask)[:, :, 3]
+        base_rgba = np.zeros((h, w, 4), dtype=np.uint8)
+        base_rgba[:, :, 0] = 255
+        base_rgba[:, :, 1] = 255
+        base_rgba[:, :, 2] = 255
+        base_rgba[:, :, 3] = obj_alpha
+        base_img = Image.fromarray(base_rgba)
+        sketch_object = Image.alpha_composite(base_img, outline_img)
+        sketch_object.save(out_dir / f"{item}-sketch-object.png")
+        item_status["completed_steps"].append("sketch_object"); _save_regen_jobs()
+
+        # Step 9: Create sketch-composite (background + sketch-object)
+        item_status["step"] = "creating sketch composite"
+        bg_for_comp = Image.open(out_dir / f"{item}-background.png").convert("RGBA")
+        sketch_composite = Image.alpha_composite(bg_for_comp, sketch_object)
+        sketch_composite.save(out_dir / f"{item}-sketch-composite.png")
+        item_status["completed_steps"].append("sketch_composite"); _save_regen_jobs()
+
         item_status["status"] = "done"
         item_status["step"] = "complete"
 

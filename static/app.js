@@ -120,6 +120,8 @@ function renderItemView() {
     { suffix: 'object', label: 'Object', checker: true },
     { suffix: 'scene', label: 'Scene', checker: false },
     { suffix: 'background', label: 'Background', checker: false },
+    { suffix: 'sketch-object', label: 'Sketch', checker: true },
+    { suffix: 'sketch-composite', label: 'Sketch+BG', checker: false },
   ];
 
   // 재생성 중이거나 최근 완료된 아이템은 캐시 버스팅
@@ -235,6 +237,8 @@ function renderGridView() {
       { suffix: 'object', label: 'Object', checker: true },
       { suffix: 'scene', label: 'Scene', checker: false },
       { suffix: 'background', label: 'Background', checker: false },
+      { suffix: 'sketch-object', label: 'Sketch', checker: true },
+      { suffix: 'sketch-composite', label: 'Sketch+BG', checker: false },
     ];
 
     const imagesHtml = variants.map(v => {
@@ -541,6 +545,10 @@ function refreshImageForStep(step, item) {
     object: `-object.png`,
     scene: `-scene.png`,
     background: `-background.png`,
+    sketch: `-sketch.png`,
+    outline: `-outline.png`,
+    sketch_object: `-sketch-object.png`,
+    sketch_composite: `-sketch-composite.png`,
   };
   const suffix = stepFileMap[step];
   if (!suffix) return;
