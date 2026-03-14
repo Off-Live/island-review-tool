@@ -13,12 +13,12 @@ import requests as http_requests
 from flask import Flask, jsonify, render_template, request, send_file, send_from_directory
 from PIL import Image, ImageFilter
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 app = Flask(__name__)
 
 IMAGES_DIR = Path(os.environ.get("IMAGES_DIR", "../island-images/island-images"))
-RESULTS_FILE = Path("./results.json")
+RESULTS_FILE = IMAGES_DIR / "results.json"
 CATEGORIES = ["fruits", "vegetables", "everyday"]
 
 STYLE = (
@@ -107,8 +107,8 @@ BG_DESCRIPTIONS = {
 }
 
 # In-memory job tracking
-REGEN_JOBS_FILE = Path("./regen_jobs.json")
-REGEN_LOGS_DIR = Path("./regen_logs")
+REGEN_JOBS_FILE = IMAGES_DIR / "regen_jobs.json"
+REGEN_LOGS_DIR = IMAGES_DIR / "regen_logs"
 AGENT_SESSIONS_DIR = Path(os.path.expanduser("~/.openclaw/agents/island-prompt/sessions"))
 
 _regen_jobs_lock = threading.Lock()
