@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Island Image Review</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Island Image Review</h1>
+    <div class="progress-bar-container">
+      <div class="progress-fill fail" id="progress-fail"></div>
+      <div class="progress-fill pass" id="progress-pass"></div>
+      <div class="progress-text" id="progress-text">Loading...</div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab active" data-tab="item" onclick="switchTab('item')">📋 Item View</button>
+      <button class="tab" data-tab="grid" onclick="switchTab('grid')">🗂 Grid View</button>
+    </div>
+    <div class="controls">
+      <button data-filter="all" class="active" onclick="setFilter('all')">All</button>
+      <button data-filter="unreviewed" onclick="setFilter('unreviewed')">Unreviewed</button>
+      <button data-filter="pass" onclick="setFilter('pass')">Pass</button>
+      <button data-filter="fail" onclick="setFilter('fail')">Fail</button>
+      <div class="separator"></div>
+      <button data-category="all" class="active" onclick="setCategory('all')">All</button>
+      <button data-category="fruits" onclick="setCategory('fruits')">Fruits</button>
+      <button data-category="vegetables" onclick="setCategory('vegetables')">Vegetables</button>
+      <button data-category="everyday" onclick="setCategory('everyday')">Everyday</button>
+    </div>
+  </div>
+
+  <div id="regen-section" class="regen-section" style="display:none">
+    <div class="regen-header">
+      <h2>불합격 아이템</h2>
+      <button class="btn-regen-all" onclick="regenAll()">전체 재생성</button>
+    </div>
+    <div id="regen-status-bar" class="regen-status-bar" style="display:none">
+      <div class="regen-progress-info">
+        <span id="regen-progress-text">0 / 0</span>
+        <div class="regen-progress-bar"><div class="regen-progress-fill" id="regen-progress-fill"></div></div>
+      </div>
+    </div>
+    <div id="failed-list" class="failed-list"></div>
+  </div>
+
+  <div id="item-view" class="item-view"></div>
+  <div id="grid-view" class="grid" style="display:none"></div>
+
+  <!-- Floating Regen Status Panel -->
+  <div id="floating-regen-panel" class="floating-panel" style="display:none">
+    <div class="fp-header">재생성 현황</div>
+    <div id="fp-list" class="fp-list"></div>
+  </div>
+
+  <div class="shortcut-help">
+    <kbd>&larr;</kbd> prev &nbsp; <kbd>&rarr;</kbd> next &nbsp; <kbd>p</kbd> pass &nbsp; <kbd>f</kbd> fail
+  </div>
+
+  <script src="/static/app.js"></script>
+  <script>
+    const itemData = [
+      {% for category in categories %}
+        {% for name in items[category] %}
+          { name: "{{ name }}", category: "{{ category }}" },
+        {% endfor %}
+      {% endfor %}
+    ];
+    init(itemData);
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.env
+results.json
+regen_jobs.json
+regen_logs/
+__pycache__/
+*.pyc
+.DS_Store

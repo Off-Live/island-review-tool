@@ -1,0 +1,6 @@
+flask
+fal_client
+Pillow
+numpy
+requests
+python-dotenv
